@@ -12,7 +12,7 @@
 #define ARRAY_LEN(arr) \
     (sizeof(arr)/sizeof(arr[0]))
 
-static void read_elf_text_segment(const char *elffile,
+static bool read_elf_text_segment(const char *elffile,
                                   uint8_t **text_buffer,
                                   size_t *text_size);
 
@@ -24,9 +24,11 @@ int main(int argc, char **argv) {
 
     uint8_t *buffer = NULL;
     size_t size = 0;
-    read_elf_text_segment(argv[1], &buffer, &size);
+    if (!read_elf_text_segment(argv[1], &buffer, &size)) {
+        return 1;
+    }
 
-    /* 
+    /*
      * Create context with default initialization
      * (using malloc/free for alloc's)
      */
@@ -55,14 +57,14 @@ int main(int argc, char **argv) {
     return 0;
 }
 
-static void read_elf_text_segment(const char *elffile,
+static bool read_elf_text_segment(const char *elffile,
                                   uint8_t **text_buffer,
                                   size_t *text_size) {
     /* Start by reading entire file into a buffer */
     FILE *fd = fopen(elffile, "r");
     if (!fd) {
         fprintf(stderr, "Failed to open file %s!\n", elffile);
-        return;
+        return false;
     }
 
     fseek(fd, 0, SEEK_END);
@@ -74,7 +76,7 @@ static void read_elf_text_segment(const char *elffile,
     if (bytes_read != size) {
         fprintf(stderr, "Failed to read file %s (%ll/%zs bytes read)!\n", elffile, size, bytes_read);
         fclose(fd);
-        return;
+        return false;
     }
     fclose(fd);
 
@@ -84,12 +86,12 @@ static void read_elf_text_segment(const char *elffile,
         buffer[EI_MAG2] != ELFMAG2 ||
         buffer[EI_MAG3] != ELFMAG3) {
         fprintf(stderr, "Invalid ELF header for file %s!\n", elffile);
-        return;
+        return false;
     }
     /* TODO(anjo): Is there some nice way to deal with both 32/64-bit ELFs? */
     if (buffer[EI_CLASS] != ELFCLASS64) {
         fprintf(stderr, "Only support 64-bit ELFs!\n");
-        return;
+        return false;
     }
 
     Elf64_Ehdr *e_hdr = (Elf64_Ehdr *) buffer;
@@ -111,7 +113,7 @@ static void read_elf_text_segment(const char *elffile,
     if (!found_text) {
         fprintf(stderr, "Couldn't find .text segment in elf %s\n", elffile);
         free(buffer);
-        return;
+        return false;
     }
 
     /* Copy the actual .text bytes */
@@ -120,5 +122,6 @@ static void read_elf_text_segment(const char *elffile,
     memcpy(*text_buffer, buffer + s_hdr->sh_offset, *text_size);
 
     free(buffer);
-}
 
+    return true;
+}
