@@ -74,7 +74,7 @@ static bool read_elf_text_segment(const char *elffile,
     uint8_t *buffer = malloc(size);
     size_t bytes_read = fread(buffer, 1, size, fd);
     if (bytes_read != size) {
-        fprintf(stderr, "Failed to read file %s (%ll/%zs bytes read)!\n", elffile, size, bytes_read);
+        fprintf(stderr, "Failed to read file %s (%ld/%zu bytes read)!\n", elffile, size, bytes_read);
         fclose(fd);
         return false;
     }
