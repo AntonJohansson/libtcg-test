@@ -10,7 +10,11 @@ The install-dir of `qemu-libtcg` can be changed via
 ```
 qemu-libtcg/build> meson configure -Dprefix=/my/install/dir
 ```
-and the `build_and_run_x86_64.sh` script is run as
+another useful option for debugging purposes is to disable stripping of debug symbols during installation, using
+```
+qemu-libtcg/build> meson configure -Dstrip=false
+```
+Finally, the `build_and_run_x86_64.sh` script is run as
 ```
 libtcg-test> sh build_and_run_x86_64.sh /my/install/dir
 ```
