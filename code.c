@@ -1,3 +1,7 @@
 int f(int i) {
-    return i*2;
+    if (i < 2) {
+        return 1;
+    } else {
+        return 2;
+    }
 }

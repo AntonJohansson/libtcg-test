@@ -104,7 +104,7 @@ static bool read_elf_text_segment(const char *elffile,
     Elf64_Shdr *s_hdr;
     for (uint32_t i = 0; i < e_hdr->e_shnum; ++i) {
         s_hdr = (Elf64_Shdr *) (buffer + e_hdr->e_shoff + i*e_hdr->e_shentsize);
-        if (s_hdr->sh_name && strncmp(str_table + s_hdr->sh_name, ".text", 5) == 0) {
+        if (s_hdr->sh_name && strncmp(str_table + s_hdr->sh_name, ".bar", 4) == 0) {
             found_text = true;
             break;
         }
