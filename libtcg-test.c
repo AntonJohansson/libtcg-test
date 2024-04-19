@@ -1,4 +1,4 @@
-#include "libtcg.h"
+#include <qemu/libtcg/libtcg.h>
 
 #include <elf.h>
 
@@ -35,15 +35,16 @@ int main(int argc, char **argv) {
     LibTcgContext *context = libtcg_context_create(&(LibTcgDesc){0});
 
     size_t offset = 0;
+    uint64_t virtual_address = 0x1000;
     while (offset <= size) {
-        uint64_t virtual_address = 0x400000;
         LibTcgInstructionList tcgops = libtcg_translate(context,
                                                         buffer,
-                                                        0x400000,
+                                                        0x1000,
                                                         size,
                                                         virtual_address,
                                                         0);
         offset += tcgops.size_in_bytes;
+        virtual_address += tcgops.size_in_bytes;
 
         char dump_buf[256] = {0};
         for (size_t i = 0; i < tcgops.instruction_count; ++i) {
@@ -107,7 +108,7 @@ static bool read_elf_text_segment(const char *elffile,
         Elf64_Shdr *s_hdr;
         for (uint32_t i = 0; i < e_hdr->e_shnum; ++i) {
             s_hdr = (Elf64_Shdr *) (buffer + e_hdr->e_shoff + i*e_hdr->e_shentsize);
-            if (s_hdr->sh_name && strncmp((const char *) (str_table + s_hdr->sh_name), "text", 4) == 0) {
+            if (s_hdr->sh_name && strncmp((const char *) (str_table + s_hdr->sh_name), ".text", 4) == 0) {
                 found_text = true;
                 break;
             }
