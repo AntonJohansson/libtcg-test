@@ -36,7 +36,7 @@ int main(int argc, char **argv) {
 
     size_t offset = 0;
     uint64_t virtual_address = 0x1000;
-    while (offset <= size) {
+    while (offset < size) {
         LibTcgInstructionList tcgops = libtcg_translate(context,
                                                         buffer,
                                                         0x1000,
@@ -108,7 +108,7 @@ static bool read_elf_text_segment(const char *elffile,
         Elf64_Shdr *s_hdr;
         for (uint32_t i = 0; i < e_hdr->e_shnum; ++i) {
             s_hdr = (Elf64_Shdr *) (buffer + e_hdr->e_shoff + i*e_hdr->e_shentsize);
-            if (s_hdr->sh_name && strncmp((const char *) (str_table + s_hdr->sh_name), ".text", 4) == 0) {
+            if (s_hdr->sh_name && strncmp((const char *) (str_table + s_hdr->sh_name), ".text", 5) == 0) {
                 found_text = true;
                 break;
             }
@@ -134,7 +134,7 @@ static bool read_elf_text_segment(const char *elffile,
         Elf32_Shdr *s_hdr;
         for (uint32_t i = 0; i < e_hdr->e_shnum; ++i) {
             s_hdr = (Elf32_Shdr *) (buffer + e_hdr->e_shoff + i*e_hdr->e_shentsize);
-            if (s_hdr->sh_name && strncmp((const char *) (str_table + s_hdr->sh_name), ".text", 4) == 0) {
+            if (s_hdr->sh_name && strncmp((const char *) (str_table + s_hdr->sh_name), ".text", 5) == 0) {
                 found_text = true;
                 break;
             }
